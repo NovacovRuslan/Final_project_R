@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
 from src.database import get_db
 from src.models import User
 from src.schemas import UserCreate, User as UserSchema
@@ -62,3 +63,8 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return {"message": "User deleted"}
+
+@router.get("/", response_model=List[UserSchema])
+def get_users(db: Session = Depends(get_db), skip: int = 0, limit: int = 100 ):
+    users = db.query(User).offset(skip).limit(limit).all()
+    return users
